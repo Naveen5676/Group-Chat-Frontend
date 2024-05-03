@@ -1,15 +1,23 @@
-import React , {useRef}from "react";
+import React, { useRef } from "react";
+import axios from "axios";
 function SignInForm() {
   const email = useRef();
   const password = useRef();
 
   const handleOnSubmit = (evt) => {
     evt.preventDefault();
-   const data = {
-    email:email.current.value,
-    password:password.current.value
-   }
-   console.log(data)
+    const data = {
+      email: email.current.value,
+      password: password.current.value,
+    };
+    axios
+      .post("http://localhost:3000/login", data)
+      .then(() => {
+        alert("successfully logged in");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -18,12 +26,7 @@ function SignInForm() {
         <h1>Sign in</h1>
 
         <span>or use your account</span>
-        <input
-          type="email"
-          placeholder="Email"
-          name="email"
-          ref={email}
-        />
+        <input type="email" placeholder="Email" name="email" ref={email} />
         <input
           type="password"
           name="password"
