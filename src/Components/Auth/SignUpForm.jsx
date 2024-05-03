@@ -1,4 +1,6 @@
 import React  , {useRef} from "react";
+import axios from 'axios'
+
 function SignUpForm() {
 
   const name = useRef();
@@ -11,10 +13,19 @@ function SignUpForm() {
     const data = {
       name:name.current.value,
       email:email.current.value,
-      phoeno : phoneno.current.value,
+      phoneno : phoneno.current.value,
       password :password.current.value
     }
-    console.log(data)
+    axios.post("http://localhost:3000/signup", data).then(()=>{
+      alert("Sign Up Successfully")
+      console.log(data)
+    }).catch((err)=>{
+      if (err.response.data){
+        alert('User already exists, Please Login')
+      }
+      console.log(err)
+    })
+   
     
   };
 
