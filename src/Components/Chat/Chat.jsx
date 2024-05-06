@@ -7,7 +7,7 @@ function Chat() {
   const token = localStorage.getItem("userid");
 
   const [latestMessages, setLatestMessages] = useState([]);
-  const [changes , setChanges]= useState(false);
+
 
   async function fetchData() {
     try {
@@ -18,9 +18,15 @@ function Chat() {
     }
   }
 
+  setInterval(fetchData , 100000);
+
   useEffect(() => {
     fetchData();
-  }, [changes]);
+    const interval = setInterval(fetchData , 10000)
+    return (()=>{
+      clearInterval(interval)
+    })
+  }, []);
 
   function dataHandler(e) {
     e.preventDefault();
@@ -35,7 +41,7 @@ function Chat() {
       })
       .then(() => {
         alert("Data sent to database");
-        setChanges(!changes)
+        fetchData();
       })
       .catch((err) => {
         console.error("Error sending data:", err);
