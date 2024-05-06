@@ -15,8 +15,10 @@ function SignInForm() {
     };
     axios
       .post("http://localhost:3000/login", data)
-      .then(() => {
+      .then((response) => {
         alert("successfully logged in");
+        //console.log(response.data.Token)
+        localStorage.setItem('userid',response.data.Token )
         navigate("/chat", { replace: true });
       })
       .catch((error) => {
