@@ -15,6 +15,7 @@ function SignUpForm() {
       phoneno: phoneno.current.value,
       password: password.current.value,
     };
+    console.log(data)
     axios
       .post("http://localhost:3000/signup", data)
       .then(() => {
@@ -42,7 +43,7 @@ function SignUpForm() {
           <h1 className="pt-8 pb-6 font-bold dark:text-gray-400 text-5xl text-center cursor-default">
             Sign Up
           </h1>
-          <form onClick={handleOnSubmit} className="space-y-4">
+          <form onSubmit={handleOnSubmit} className="space-y-4">
           <div>
               <label for="name" className="mb-2  dark:text-gray-400 text-lg">Name</label>
               <input
