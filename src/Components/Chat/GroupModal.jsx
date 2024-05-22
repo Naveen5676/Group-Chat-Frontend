@@ -6,7 +6,7 @@ const GroupModal = ({ setIsModalOpen , getGroupList  }) => {
   const token = localStorage.getItem("userid");
   const dataHandler = async(e) => {
     e.preventDefault();
-    console.log(groupnameref.current.value);
+    //console.log(groupnameref.current.value);
     setIsModalOpen(false)
     const data = {
         groupname : groupnameref.current.value
