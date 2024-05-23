@@ -18,6 +18,7 @@ function Chat() {
   const [useringroup, setUserInGroup] = useState(true);
   const [userInfo, setUserInfo] = useState({});
 
+  {console.log(latestMessages)}
   async function membersmodalHandler() {
     setismembersModalOpen(true);
   }
@@ -131,6 +132,7 @@ function Chat() {
         localStorage.removeItem("latestMessageId");
         localStorage.removeItem("messages");
       }
+      fetchData(selectedGroup)
       getGroupList();
     }, [selectedGroup]);
   
