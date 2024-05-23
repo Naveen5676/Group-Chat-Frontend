@@ -3,6 +3,9 @@ import "tailwindcss/tailwind.css";
 import axios from "axios";
 import GroupModal from "./GroupModal";
 import MembersModal from "./MembersModal";
+import {io} from "socket.io-client"
+
+
 
 function Chat() {
   const messageref = useRef();
@@ -18,7 +21,11 @@ function Chat() {
   const [useringroup, setUserInGroup] = useState(true);
   const [userInfo, setUserInfo] = useState({});
 
-  {console.log(latestMessages)}
+  const socket = io("http://localhost:5000")
+  // socket.on("data", (data) => {
+  //   console.log(data);
+  // })
+
   async function membersmodalHandler() {
     setismembersModalOpen(true);
   }
@@ -95,39 +102,65 @@ function Chat() {
       }
     }
   
-    async function fetchData(groupid) {
-      try {
-        const latestMessageId = parseInt(localStorage.getItem("latestMessageId")) || 0;
-        const chats = JSON.parse(localStorage.getItem("messages")) || [];
-        const response = await axios.get(
-          `http://localhost:3000/showchatdata?latestmessageId=${latestMessageId}&groupid=${groupid}`
-        );
-        const messages = response.data;
+    // async function fetchData(groupid) {
+    //   try {
+    //   const latestMessageId = parseInt(localStorage.getItem("latestMessageId")) || 0;
+    //     const chats = JSON.parse(localStorage.getItem("messages")) || [];  
+    //     const response = await axios.get(
+    //       `http://localhost:3000/showchatdata?latestmessageId=${latestMessageId}&groupid=${groupid}`
+    //     );
+    //     const messages = response.data;
   
-        if (messages.length > 0) {
-          const updatedMessages = [...chats, ...messages];
-          localStorage.setItem("messages", JSON.stringify(updatedMessages));
-          setLatestMessages(updatedMessages);
-          setResponseMessageLength(true);
-          const newLatestMessageId = updatedMessages[updatedMessages.length - 1].id;
-          localStorage.setItem("latestMessageId", newLatestMessageId);
-        } else {
-          if (!chats.length) {
-            setResponseMessageLength(false);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    //     if (messages.length > 0) {
+    //       const updatedMessages = [...chats, ...messages];
+    //       localStorage.setItem("messages", JSON.stringify(updatedMessages));
+    //       setLatestMessages(updatedMessages);
+    //       setResponseMessageLength(true);
+    //       const newLatestMessageId = updatedMessages[updatedMessages.length - 1].id;
+    //       localStorage.setItem("latestMessageId", newLatestMessageId);
+    //     } else {
+    //       if (!chats.length) {
+    //         setResponseMessageLength(false);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // }
+
+    async function fetchData(groupid){
+      try {
+          const latestMessageId = parseInt(localStorage.getItem("latestMessageId")) || 0;
+          const chats = JSON.parse(localStorage.getItem("messages")) || [];  
+          socket.emit("getChats" , latestMessageId , groupid);
+
+          socket.on("groupmessagedata", (messages)=>{
+            if (messages.length > 0) {
+                    const updatedMessages = [...chats, ...messages];
+                    localStorage.setItem("messages", JSON.stringify(updatedMessages));
+                    setLatestMessages(updatedMessages);
+                    setResponseMessageLength(true);
+                    const newLatestMessageId = updatedMessages[updatedMessages.length - 1].id;
+                    localStorage.setItem("latestMessageId", newLatestMessageId);
+                  } else {
+                    if (!chats.length) {
+                      setResponseMessageLength(false);
+                    }
+                  }
+          })
+
+      }catch(error){
+        console.log('fetchData error', error)
       }
     }
   
     useEffect(() => {
       if (selectedGroup) {
         fetchData(selectedGroup);
-        const interval = setInterval(() => fetchData(selectedGroup), 10000);
-        return () => {
-          clearInterval(interval);
-        };
+        // const interval = setInterval(() => fetchData(selectedGroup), 10000);
+        // return () => {
+        //   clearInterval(interval);
+        // };
       } else {
         localStorage.removeItem("latestMessageId");
         localStorage.removeItem("messages");
