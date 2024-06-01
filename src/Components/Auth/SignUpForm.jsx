@@ -17,7 +17,7 @@ function SignUpForm() {
     };
     //console.log(data)
     axios
-      .post("http://localhost:3000/signup", data)
+      .post("http://54.196.175.126:3000/signup", data)
       .then(() => {
         alert("Sign Up Successfully");
         //console.log(data);
@@ -101,7 +101,7 @@ function SignUpForm() {
               Have an account ? 
               <a
                 className="group text-blue-400 transition-all duration-100 ease-in-out"
-                href="http://localhost:5173/login"
+                href="http://54.196.175.126:5173/login"
               >
                 <span
                   className="bg-left-bottom bg-gradient-to-r from-blue-400 to-blue-400 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out"

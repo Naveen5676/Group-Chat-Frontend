@@ -21,9 +21,63 @@ function Chat() {
   const [responsemessagelength, setResponseMessageLength] = useState(false);
   const [useringroup, setUserInGroup] = useState(true);
   const [userInfo, setUserInfo] = useState({});
+  const [publicChat, setPublicChat] = useState(true); // Flag for public chat
 
-  const socket = io("http://localhost:5000");
-  
+  const socket = io("http://54.196.175.126:5000");
+
+  useEffect(() => {
+    if (publicChat) {
+      socket.emit("joinPublic");
+      fetchPublicData();
+    } else if (selectedGroup) {
+      socket.emit("joinGroup", selectedGroup);
+      fetchData(selectedGroup);
+    }
+    getGroupList();
+  }, [publicChat, selectedGroup]);
+
+  // Function to handle group message data
+  const handleGroupMessageData = (messages) => {
+    console.log("group messages", messages);
+    if (messages.length > 0) {
+      setLatestMessages(messages);
+      setResponseMessageLength(true);
+    } else {
+      setResponseMessageLength(false);
+    }
+  };
+
+  // Function to handle public message data
+  const handlePublicMessageData = (messages) => {
+    console.log("public messages", messages);
+    if (messages.length > 0) {
+      setLatestMessages(messages);
+      setResponseMessageLength(true);
+    } else {
+      setResponseMessageLength(false);
+    }
+  };
+
+  useEffect(() => {
+    if (publicChat) {
+      socket.emit("joinPublic");
+      fetchPublicData();
+    } else if (selectedGroup) {
+      socket.emit("joinGroup", selectedGroup);
+      fetchData(selectedGroup);
+    }
+    getGroupList();
+
+    // Attach socket listeners
+    socket.on("groupmessagedata", handleGroupMessageData);
+    socket.on("publicmessagedata", handlePublicMessageData);
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("groupmessagedata", handleGroupMessageData);
+      socket.off("publicmessagedata", handlePublicMessageData);
+    };
+  }, [publicChat, selectedGroup]);
 
   async function membersmodalHandler() {
     setismembersModalOpen(true);
@@ -36,7 +90,7 @@ function Chat() {
         groupid: selectedGroup,
       };
       const response = await axios.post(
-        "http://localhost:3000/joingroup",
+        "http://54.196.175.126:3000/joingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -56,7 +110,7 @@ function Chat() {
     try {
       const data = { groupid: groupid };
       const response = await axios.post(
-        "http://localhost:3000/checkuserpresentingroup",
+        "http://54.196.175.126:3000/checkuserpresentingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -69,17 +123,16 @@ function Chat() {
 
   async function groupchangeHandler(groupid, e, groupname) {
     e.preventDefault();
-    localStorage.removeItem("latestMessageId");
-    localStorage.removeItem("messages");
     setSelectedGroup(groupid);
     setSelectedGroupName(groupname);
+    setPublicChat(false);
 
     const data = {
       groupid: groupid,
     };
     try {
       const userpresentingroup = await axios.post(
-        "http://localhost:3000/checkuserpresentingroup",
+        "http://54.196.175.126:3000/checkuserpresentingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -93,100 +146,32 @@ function Chat() {
 
   async function getGroupList() {
     try {
-      const response = await axios.get("http://localhost:3000/getgrouplist");
+      const response = await axios.get("http://54.196.175.126:3000/getgrouplist");
       setgrouplist(response.data);
     } catch (error) {
       console.error("Error fetching group list:", error);
     }
   }
 
-  // async function fetchData(groupid) {
-  //   try {
-  //   const latestMessageId = parseInt(localStorage.getItem("latestMessageId")) || 0;
-  //     const chats = JSON.parse(localStorage.getItem("messages")) || [];
-  //     const response = await axios.get(
-  //       `http://localhost:3000/showchatdata?latestmessageId=${latestMessageId}&groupid=${groupid}`
-  //     );
-  //     const messages = response.data;
-
-  //     if (messages.length > 0) {
-  //       const updatedMessages = [...chats, ...messages];
-  //       localStorage.setItem("messages", JSON.stringify(updatedMessages));
-  //       setLatestMessages(updatedMessages);
-  //       setResponseMessageLength(true);
-  //       const newLatestMessageId = updatedMessages[updatedMessages.length - 1].id;
-  //       localStorage.setItem("latestMessageId", newLatestMessageId);
-  //     } else {
-  //       if (!chats.length) {
-  //         setResponseMessageLength(false);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // }
-
   async function fetchData(groupid) {
     try {
-      const latestMessageId =
-        parseInt(localStorage.getItem("latestMessageId")) || 0;
-      const chats = JSON.parse(localStorage.getItem("messages")) || [];
+      const latestMessageId = 0; // Fetch all messages for the group
       socket.emit("getChats", latestMessageId, groupid);
-
-      socket.on("groupmessagedata", (messages) => {
-        if (messages.length > 0) {
-          const updatedMessages = [...chats, ...messages];
-          localStorage.setItem("messages", JSON.stringify(updatedMessages));
-          setLatestMessages(updatedMessages);
-          setResponseMessageLength(true);
-          const newLatestMessageId =
-            updatedMessages[updatedMessages.length - 1].id;
-          localStorage.setItem("latestMessageId", newLatestMessageId);
-        } else {
-          if (!chats.length) {
-            setResponseMessageLength(false);
-          }
-        }
-      });
+      socket.on("groupmessagedata", handleGroupMessageData);
     } catch (error) {
       console.log("fetchData error", error);
     }
   }
 
-  useEffect(() => {
-    if (selectedGroup) {
-      fetchData(selectedGroup);
-      // const interval = setInterval(() => fetchData(selectedGroup), 10000);
-      // return () => {
-      //   clearInterval(interval);
-      // };
-    } else {
-      localStorage.removeItem("latestMessageId");
-      localStorage.removeItem("messages");
+  async function fetchPublicData() {
+    try {
+      const latestMessageId = 0; // Fetch all public messages
+      socket.emit("getChats", latestMessageId, 0);
+      socket.on("publicmessagedata", handlePublicMessageData);
+    } catch (error) {
+      console.log("fetchPublicData error", error);
     }
-    fetchData(selectedGroup);
-    getGroupList();
-  }, [selectedGroup]);
-
-  // function dataHandler(e) {
-  //   e.preventDefault();
-
-  //   console.log(fileref.current.files[0])
-  //   const data = { message: messageref.current.value, groupid: selectedGroup , file: fileref.current.files[0] };
-
-  //   axios
-  //     .post(`http://localhost:3000/sendchat`, data, {
-  //       headers: { Authorization: token },
-  //     })
-  //     .then(() => {
-  //       alert("Data sent to database");
-  //       fetchData(selectedGroup);
-  //       messageref.current.value = "";
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error sending data:", err);
-  //     });
-  // }
+  }
 
   async function dataHandler(e) {
     e.preventDefault();
@@ -198,15 +183,18 @@ function Chat() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/sendchat`,
+        `http://54.196.175.126:3000/sendchat`,
         formData,
         { headers: { Authorization: token } }
-       
       );
-     
+
       if (response) {
         alert("Data Sent to Database");
-        fetchData(selectedGroup);
+        if (publicChat) {
+          fetchPublicData();
+        } else {
+          fetchData(selectedGroup);
+        }
         messageref.current.value = "";
         fileref.current.value = null;
       }
@@ -214,7 +202,6 @@ function Chat() {
       console.log("error sending data ", error);
     }
   }
-
   return (
     <div className="flex flex-col min-h-screen">
       <h1 className="text-center text-3xl">Chat App</h1>
@@ -272,7 +259,6 @@ function Chat() {
                         <a
                           href={result.fileurl}
                           target="_blank"
-                          rel="noopener noreferrer"
                           className="ml-2 text-blue-600"
                         >
                           {result.filename}

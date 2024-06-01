@@ -13,11 +13,11 @@ const GroupModal = ({ setismembersModalOpen, selectedGroup  , setUserInGroup , u
         userid: memberId
       }
       //console.log(data);
-      const response = await axios.post("http://localhost:3000/deleteuserfromgroup", data );
+      const response = await axios.post("http://54.196.175.126:3000/deleteuserfromgroup", data );
       //console.log(response)
       if (response){
         setismembersModalOpen(false)
-        setUserInGroup(false)
+        //setUserInGroup(false)
       }
     } catch (error) {
       console.error("Error removing group member:", error);
@@ -28,7 +28,7 @@ const GroupModal = ({ setismembersModalOpen, selectedGroup  , setUserInGroup , u
     const fetchGroupMembers = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/getalluserofgroup",
+          "http://54.196.175.126:3000/getalluserofgroup",
           { groupid: selectedGroup }
         );
         setGroupMembers(response.data.allUsers);
@@ -40,7 +40,7 @@ const GroupModal = ({ setismembersModalOpen, selectedGroup  , setUserInGroup , u
     const getGroupAdminId = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/groupadminid",
+          "http://54.196.175.126:3000/groupadminid",
           { groupid: selectedGroup }
         );
         setGroupAdminId(response.data.AdminId);

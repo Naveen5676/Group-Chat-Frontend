@@ -14,7 +14,7 @@ function SignInForm() {
       password: password.current.value,
     };
     axios
-      .post("http://localhost:3000/login", data)
+      .post("http://54.196.175.126:3000/login", data)
       .then((response) => {
         alert("successfully logged in");
         //console.log(response.data.Token)
@@ -87,7 +87,7 @@ function SignInForm() {
                 Don't have an account?
                 <a
                   className="group text-blue-400 transition-all duration-100 ease-in-out"
-                  href="http://localhost:5173/signup"
+                  href="http://54.196.175.126:5173/signup"
                 >
                   <span className="bg-left-bottom bg-gradient-to-r from-blue-400 to-blue-400 bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out">
                     Sign Up
