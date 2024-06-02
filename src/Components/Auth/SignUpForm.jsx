@@ -17,7 +17,7 @@ function SignUpForm() {
     };
     //console.log(data)
     axios
-      .post("http://54.196.175.126:3000/signup", data)
+      .post("http://54.196.175.126/signup", data)
       .then(() => {
         alert("Sign Up Successfully");
         //console.log(data);

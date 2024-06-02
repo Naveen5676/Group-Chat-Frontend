@@ -90,7 +90,7 @@ function Chat() {
         groupid: selectedGroup,
       };
       const response = await axios.post(
-        "http://54.196.175.126:3000/joingroup",
+        "http://54.196.175.126/joingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -110,7 +110,7 @@ function Chat() {
     try {
       const data = { groupid: groupid };
       const response = await axios.post(
-        "http://54.196.175.126:3000/checkuserpresentingroup",
+        "http://54.196.175.126/checkuserpresentingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -132,7 +132,7 @@ function Chat() {
     };
     try {
       const userpresentingroup = await axios.post(
-        "http://54.196.175.126:3000/checkuserpresentingroup",
+        "http://54.196.175.126/checkuserpresentingroup",
         data,
         { headers: { Authorization: token } }
       );
@@ -146,7 +146,7 @@ function Chat() {
 
   async function getGroupList() {
     try {
-      const response = await axios.get("http://54.196.175.126:3000/getgrouplist");
+      const response = await axios.get("http://54.196.175.126/getgrouplist");
       setgrouplist(response.data);
     } catch (error) {
       console.error("Error fetching group list:", error);
@@ -183,7 +183,7 @@ function Chat() {
 
     try {
       const response = await axios.post(
-        `http://54.196.175.126:3000/sendchat`,
+        `http://54.196.175.126/sendchat`,
         formData,
         { headers: { Authorization: token } }
       );
@@ -204,7 +204,9 @@ function Chat() {
   }
   return (
     <div className="flex flex-col min-h-screen">
+      <div className="bg-cyan-400">
       <h1 className="text-center text-3xl">Chat App</h1>
+      </div>
       <div className="flex-grow flex">
         <div className="w-1/4 bg-gray-200 p-4">
           {userInfo && userInfo.name && (

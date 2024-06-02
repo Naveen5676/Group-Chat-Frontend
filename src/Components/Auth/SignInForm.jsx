@@ -14,7 +14,7 @@ function SignInForm() {
       password: password.current.value,
     };
     axios
-      .post("http://54.196.175.126:3000/login", data)
+      .post("http://54.196.175.126/login", data)
       .then((response) => {
         alert("successfully logged in");
         //console.log(response.data.Token)

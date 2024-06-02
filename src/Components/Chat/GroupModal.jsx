@@ -11,7 +11,7 @@ const GroupModal = ({ setIsModalOpen , getGroupList  }) => {
     const data = {
         groupname : groupnameref.current.value
     }
-    const response = await axios.post('http://54.196.175.126:3000/creatgroup' , data , { headers: { Authorization: token }})
+    const response = await axios.post('http://54.196.175.126/creatgroup' , data , { headers: { Authorization: token }})
     if(response){
         alert('group created successfuylly')
         getGroupList()
